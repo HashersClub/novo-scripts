@@ -20,7 +20,8 @@ DUST_LIMIT = 5
 FEE_PER_KB = 35
 BLOCK_TIME = 42.0
 MAX_TRIES = 100
-SLEEP_TIME = 1 
+UTXO_SLEEP_TIME = 5 
+DATA_SLEEP_TIME = 60
 
 used_utxos = []
 
@@ -87,7 +88,7 @@ def perform_transactions(num_chunks, sender_address):
         except Exception as e:
             logging.info(f"An error occurred while sending transactions: {str(e)}")
             
-        time.sleep(SLEEP_TIME) 
+        time.sleep(UTXO_SLEEP_TIME) 
         
     final_utxo = utxo_txids.pop()  # Get the last (extra) UTXO for the final transaction
 
@@ -187,8 +188,8 @@ def prepare_raw_final_transaction(your_address, sender_address, txids, final_utx
         "content_type": content_type,
         "content_length": content_length,
         "encrypted": encrypted,
-        "licence": "creator",
-        "max_claims": 1,
+        "licence": "open",
+        "max_claims": 420,
         "whitelist": [], 
         "chunk_txids": txids
     }
@@ -216,6 +217,7 @@ def authenticate_raw_transaction(raw_tx):
 
 def broadcast_raw_transaction(signed_tx):
     txid = send_rpc_request("sendrawtransaction", [signed_tx, True])
+    time.sleep(DATA_SLEEP_TIME)        
     return txid
 
 
@@ -389,5 +391,3 @@ if __name__ == "__main__":
     main_process()
 
 logging.info("Script execution completed. Your file is now stored on NOVO")
-
-
